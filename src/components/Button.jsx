@@ -1,7 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const Button = ({ color, shape, children, onClick }) => {
+const Button = ({ color, shape, onClick, disabled, children }) => {
+
   const PropsButton = styled.button`
     ${() => colorHandler(color)};
     ${() => shapeHandler(shape)};
@@ -44,7 +45,10 @@ const Button = ({ color, shape, children, onClick }) => {
   return (
     <>
       <PropsButton
-        onClick={onClick}>
+        onClick={onClick}
+        disabled={disabled}
+      >
+
         {children}
       </PropsButton>
     </>

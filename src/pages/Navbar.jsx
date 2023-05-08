@@ -1,4 +1,7 @@
+import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import Button from '../components/Button'
 import Image from '../components/Image'
@@ -6,12 +9,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
 import { useNavigate } from 'react-router'
 
-const Header = () => {
-  const [toggle, setToggle] = useState(false);
+import Modal from './Modal'
 
-  const toggleClickHandler = () => {
-    setToggle(!toggle)
-  }
+
+const Navbar = () => {
+  const [showModal, setShowModal] = useState(false)
+  const [menuToggle, setMenuToggle] = useState(false)
+  const navigate = useNavigate()
+
+  const loginModalClickHandler = () => setShowModal(!showModal)
+  const closeModalHandler = () => setShowModal(false)
+  const toggleClickHandler = () => setMenuToggle(!menuToggle)
 
   // TODO
   // 1. 로고 클릭 시 메인화면으로 이동
@@ -20,26 +28,33 @@ const Header = () => {
   // 4. 로그인 하고 나면 이 페이지에서 state 관리해서 뿌려줘야 할듯
   // 5. location이 상세페이지일 경우 로고 변경 처리
 
-  const navigate = useNavigate()
 
   return (
     <HeaderContainer>
       <HeaderContentLeft>
+
         <HeaderLogo onClick={() => {
           navigate('/')
         }}>belog</HeaderLogo>
+
         {/* 상세페이지일 경우 nickname.log로 변경 */}
         {/* <HeaderLogo>username123.log</HeaderLogo> */}
       </HeaderContentLeft>
       <HeaderContentRight>
         <Button
           shape={'circle'}
+          onClick={loginModalClickHandler}
         >
           로그인
         </Button>
+        {
+          showModal &&
+          <Modal closeModalHandler={closeModalHandler} />
+        }
         <Button
           shape={'circle'}
           color={'transparent'}
+
           onClick={() => {
             navigate('/write')
           }}
@@ -57,7 +72,7 @@ const Header = () => {
           <SetFontAwesome icon={faCaretDown} />
         </HeaderToggleDiv>
         {
-          toggle &&
+          menuToggle &&
           <HeaderUl>
             <HeaderLi onClick={() => {
               navigate('/mypage')
@@ -73,7 +88,7 @@ const Header = () => {
   )
 }
 
-export default Header
+export default Navbar
 
 const HeaderContainer = styled.nav`
   background-color: #121212;
