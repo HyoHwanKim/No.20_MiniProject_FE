@@ -1,43 +1,39 @@
 import React, { useState } from 'react'
-import styled from 'styled-components'
 import Button from '../components/Button'
-import Input from '../components/Input'
-import LabelText from '../components/LabelText'
+import styled from 'styled-components'
+import {
+  Form,
+  GuideTextP,
+  InfoH1,
+  ButtonDiv
+} from './ModalStyle'
 
 const Login = () => {
-  const [form, setForm] = useState({
-    nickname: '',
-    password: '',
-  })
+  const [guideText, setGuideText] = useState('')
+  const [page, setPage] = useState(false)
 
   return (
-    <FormDiv>
-      <InfoH3>로그인</InfoH3>
-      <form>
-        <label>
-          <Input
+    <>
+      <FormDiv>
+        <InfoH1>로그인</InfoH1>
+        <Form>
+          <MiddleInput
             size={'medium'}
-            value={form.nickname}
             placeholder={'아이디를 입력하세요.'}
           />
-        </label>
-        <LabelText>안내 문자열 내려주기</LabelText>
-        <label>
-          <Input
+          <MiddleInput
             type={'password'}
             size={'medium'}
-            value={form.password}
             placeholder={'비밀번호를 입력하세요.'}
           />
-        </label>
-        <LabelText>안내 문자열 내려주기</LabelText>
-
+        </Form>
+        <GuideTextP>{guideText}</GuideTextP>
         <ButtonDiv>
           <Button
             type={'reset'}
             color={'white'}
-          >
-            회원가입
+            >
+            초기화
           </Button>
           <Button
             color={'mint'}
@@ -45,8 +41,8 @@ const Login = () => {
             로그인
           </Button>
         </ButtonDiv>
-      </form>
-    </FormDiv>
+      </FormDiv>
+    </>
   )
 }
 
@@ -54,22 +50,25 @@ export default Login
 
 const FormDiv = styled.div`
   display: flex;
-  margin-top: 100px;
+  margin-top: 160px;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 `
 
-const InfoH3 = styled.h3`
+const MiddleInput = styled.input`
+  width: 300px;
+  height: 45px;
+  padding: 0px 10px;
+  background-color: #1E1E1E;
+  border: 1px solid #4D4D4D;
+  border-radius: 3px;
   color: white;
-  font-size: 30px;
-  font-weight: bold;
-  margin-bottom: 20px;
-`
-
-const ButtonDiv = styled.div`
-  margin-top: 25px;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
+  &:hover {
+    border: 1px solid #96F2D7;
+  }
+  &:focus {
+    outline: none;
+    border: 1px solid #96F2D7;
+  }
 `
