@@ -5,10 +5,6 @@ import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import Button from '../components/Button'
 import Image from '../components/Image'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
-import { useNavigate } from 'react-router'
-
 import Modal from './Modal'
 
 
