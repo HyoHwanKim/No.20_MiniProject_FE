@@ -10,7 +10,6 @@ import Navbar from './pages/Navbar'
 import Detail from './pages/Detail'
 import Signup from './pages/Signup'
 import Login from './pages/Login'
-import Test from './pages/Test'
 
 
 const queryClient = new QueryClient()
@@ -27,8 +26,7 @@ const App = () => {
           <Route path="/navbar" element={<Navbar />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/detail" element={<Detail />} />
-          <Route path="/test" element={<Test />} />
+          <Route path="/detail/:id" element={<Detail />} />
 
         </Routes>
       </BrowserRouter>
