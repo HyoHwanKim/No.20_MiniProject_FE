@@ -5,6 +5,7 @@ import Main from './pages/Main'
 import Mypage from './pages/Mypage'
 import Write from './pages/Write'
 import ProfileEdit from './pages/ProfileEdit'
+import Detail from './pages/Detail'
 
 const queryClient = new QueryClient()
 
@@ -17,6 +18,7 @@ const App = () => {
           <Route path="/mypage" element={<Mypage />} />
           <Route path="/write" element={<Write />} />
           <Route path="/profile" element={<ProfileEdit />} />
+          <Route path="/detail" element={<Detail />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>
