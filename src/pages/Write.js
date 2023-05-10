@@ -17,34 +17,33 @@ function Write() {
   const handleFocus = useCallback(() => {
   }, [])
 
-  // const [formData, setFormData] = useState({
-  //   title: '',
-  //   content: '내용을 입력하세요',
-  // });
-
   const [title, setTitle] = useState('')
 
   const cookies = new Cookies()
-  const myCookie = cookies.get('loginToken')
-
-  console.log('쿠키 : ', cookies)
+  const accesstoken = cookies.get('accesstoken')
+  const refreshtoken = cookies.get('refreshtoken')
 
   const onSubmitHandler = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     const content = contentRef.current.getInstance()
-    console.log('title : ', title)
-    console.log('editor : ', content.getMarkdown())
 
-    await axios.post('http://3.34.52.229/api/posts', {
-      headers: {
-        Cookie: myCookie
-      },
-      body: {
-        title, content: content.getMarkdown()
-      }
+    const postData = {
+      title: title,
+      content: JSON.stringify(content.getMarkdown())
+    }
 
-    })
-    console.log('제출되었습니다.')
+    try {
+      await axios.post('http://3.34.52.229/api/posts', postData, {
+        headers: {
+          'Content-Type': 'application/json',
+          accesstoken: `Bearer ${accesstoken}`,
+          refreshtoken: `Bearer ${refreshtoken}`
+        }
+      })
+      console.log('제출되었습니다.')
+    } catch (error) {
+      console.error('에러난다 :', error)
+    }
   }
 
 

@@ -38,6 +38,11 @@ const Navbar = () => {
   // 4. 로그인 하고 나면 이 페이지에서 state 관리해서 뿌려줘야 할듯
   // 5. location이 상세페이지일 경우 로고 변경 처리
 
+  // 프로필 설정 페이지로 데이터 가져가기
+  const profilePageClick = () => {
+    navigate('/profile', { state: { loginInfo: getLoginInfo } });
+  }
+
 
   return (
     <HeaderContainer>
@@ -77,12 +82,12 @@ const Navbar = () => {
         }
         {
           !getLoginInfo.nickname &&
-            <Button
-              shape={'circle'}
-              onClick={loginModalClickHandler}
-            >
-              로그인
-            </Button>
+          <Button
+            shape={'circle'}
+            onClick={loginModalClickHandler}
+          >
+            로그인
+          </Button>
         }
         {
           showModal &&
@@ -94,7 +99,7 @@ const Navbar = () => {
             <HeaderLi onClick={() => navigate('/mypage')}>
               내 비로그
             </HeaderLi>
-            <HeaderLi onClick={() => navigate('/profile')}>
+            <HeaderLi onClick={profilePageClick}>
               프로필 설정
             </HeaderLi>
             <HeaderLi
