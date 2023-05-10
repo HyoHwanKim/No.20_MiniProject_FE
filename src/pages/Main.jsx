@@ -29,7 +29,9 @@ const Main = () => {
   }, [])
 
   const navigate = useNavigate()
+
   const openDetail = async (postId) => {
+
     try {
       const response = await axios.get(`http://3.34.52.229/api/posts/${postId}`)
       const post = response.data;

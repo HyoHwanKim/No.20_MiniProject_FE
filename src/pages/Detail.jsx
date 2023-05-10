@@ -57,7 +57,7 @@ const Detail = () => {
           {/* 글 작성자 정보 */}
           <UserDiv>
             <Image
-              src={`${process.env.PUBLIC_URL}/images/default_profile.png`}
+              // src={`${process.env.PUBLIC_URL}/images/default_profile.png`}
               width={'100'}
               height={'100'}
             />

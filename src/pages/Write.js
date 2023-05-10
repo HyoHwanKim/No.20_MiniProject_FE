@@ -1,7 +1,7 @@
 import '@toast-ui/editor/dist/toastui-editor.css'
 import { Editor } from '@toast-ui/react-editor'
 import React, { useRef, useCallback } from 'react'
-
+import { Cookies } from 'react-cookie'
 import {
   WriteBtnSection,
   WriteExitBtn,
@@ -24,15 +24,29 @@ function Write() {
 
   const [title, setTitle] = useState('')
 
+  const cookies = new Cookies()
+  const myCookie = cookies.get('loginToken')
+
+  console.log('쿠키 : ', cookies)
+
   const onSubmitHandler = async (e) => {
     e.preventDefault()
     const content = contentRef.current.getInstance()
     console.log('title : ', title)
     console.log('editor : ', content.getMarkdown())
 
-    await axios.post('http://3.34.52.229/api/posts', { title, content: content.getMarkdown() })
+    await axios.post('http://3.34.52.229/api/posts', {
+      headers: {
+        Cookie: myCookie
+      },
+      body: {
+        title, content: content.getMarkdown()
+      }
+
+    })
     console.log('제출되었습니다.')
   }
+
 
   return (
     <>
