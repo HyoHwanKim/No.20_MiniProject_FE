@@ -12,10 +12,15 @@ const Detail = () => {
   const { post } = location.state
   console.log('디테일 : ', post)
 
+  // console.log(post.post.title)
 
-  const deletePage = () => {
 
-  }
+  // const deletePage = async () => {
+  //   if (window.confirm('게시글을 삭제하시겠습니까?')) {
+  //     await axios.patch(`http://3.34.52.229/api/posts/${postId}`)
+
+  //   }
+  // }
 
 
   return (
@@ -36,7 +41,7 @@ const Detail = () => {
                 </div>
                 <EditDiv>
                   <EditSpan>수정</EditSpan>
-                  <EditSpan onClick={deletePage}>삭제</EditSpan>
+                  <EditSpan onClick={'/'}>삭제</EditSpan>
                 </EditDiv>
               </ContentWriter>
               <ContentTags>
