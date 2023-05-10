@@ -23,8 +23,13 @@ const Detail = () => {
   const { postComment, ...post } = location.state.post.post
   console.log(postComment)
 
-  const deletePage = () => {
 
+
+  const deletePage = async () => {
+    if (window.confirm('게시글을 삭제하시겠습니까?')) {
+      await axios.patch(`http://3.34.52.229/api/posts/${postId}`)
+
+    }
   }
 
   // * reply onChange
@@ -93,6 +98,8 @@ const Detail = () => {
                   </span>
                 </div>
                 <EditDiv>
+
+
                   {
                     getLoginInfo.nickname === post.nickname &&
                     <>
@@ -100,6 +107,7 @@ const Detail = () => {
                       <EditSpan onClick={deletePage}>삭제</EditSpan>
                     </>
                   }
+
                 </EditDiv>
               </ContentWriter>
               <ContentTags>
@@ -116,7 +124,7 @@ const Detail = () => {
           {/* 글 작성자 정보 */}
           <UserDiv>
             <Image
-              src={`${process.env.PUBLIC_URL}/images/default_profile.png`}
+              // src={`${process.env.PUBLIC_URL}/images/default_profile.png`}
               width={'100'}
               height={'100'}
             />
