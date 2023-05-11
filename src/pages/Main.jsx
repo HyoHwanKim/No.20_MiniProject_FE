@@ -7,11 +7,12 @@ import {
   BoxFooter
 } from '../components/styles'
 import Header from './Navbar'
-import { useState, useEffect } from 'react'
 import axios from 'axios'
+import { useQuery } from 'react-query'
 import { useNavigate } from 'react-router'
 
 const Main = () => {
+
   const [boxes, setBoxes] = useState([])
 
   const fetchBoxes = async () => {
@@ -29,7 +30,15 @@ const Main = () => {
 
   const navigate = useNavigate()
 
+  // * 메인페이지 조회
+  const { data } = useQuery('getMainList', async () => {
+    const mainList = await axios.get(`http://3.34.52.229/api/posts/main`)
+    return mainList.data
+  })
+
+  // * 상세 게시글 조회
   const openDetail = async (postId) => {
+
 
     try {
       const response = await axios.get(`http://3.34.52.229/api/posts/${postId}`)
@@ -45,7 +54,7 @@ const Main = () => {
     <>
       <Header />
       <MainContainer>
-        {boxes.map((box) => (
+        {data && data.posts && data.posts.map((box) => (
           <Box key={box.postId} onClick={() => openDetail(box.postId)}>
             <Boximg src="https://velog.velcdn.com/images/heelieben/post/c3dce497-2507-4097-8538-9e3d37cc4933/image.png" />
             <BoxContent>{box.title}</BoxContent>

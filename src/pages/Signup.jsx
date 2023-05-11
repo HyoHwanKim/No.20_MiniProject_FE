@@ -132,7 +132,6 @@ const Signup = ({ closeModalHandler }) => {
   // * 회원가입 유저 추가 useMutation
   const addUsersMutation = useMutation(addUsers, {
     onSuccess: (response) => {
-      console.log('onSuccess 유저 등록 성공', response)
       alert('회원가입이 성공적으로 완료되었습니다!')
       closeModalHandler()
     }
@@ -163,6 +162,19 @@ const Signup = ({ closeModalHandler }) => {
     }
 
     addUsersMutation.mutate(newUser)
+  }
+
+  // * 초기화 버튼 click
+  const resetBtnClickHandler = (e) => {
+    e.preventDefault()
+    setSignupForm({
+      nickname: '',
+      password: '',
+      passwordCheck: '',
+      email: '',
+      github: '',
+      description: '',
+    })
   }
 
   return (
@@ -235,6 +247,7 @@ const Signup = ({ closeModalHandler }) => {
         <Button
           type={'reset'}
           color={'white'}
+          onClick={resetBtnClickHandler}
           >
           초기화
         </Button>

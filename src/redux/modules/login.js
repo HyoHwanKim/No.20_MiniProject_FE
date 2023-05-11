@@ -30,6 +30,7 @@ const loginSlice = createSlice({
         // * 로그인 시 세팅된 상태값 초기화
         return initialState
       }
+
     },
     updateProfile: (state, action) => {
       const { field, value } = action.payload
@@ -40,3 +41,4 @@ const loginSlice = createSlice({
 
 export const { setLoginUser, setLogoutUser, updateProfile } = loginSlice.actions
 export default loginSlice.reducer
+

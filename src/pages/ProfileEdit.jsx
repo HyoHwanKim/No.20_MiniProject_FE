@@ -27,7 +27,6 @@ function ProfileEdit() {
   const dispatch = useDispatch()
 
   console.log(email)
-
   const handleImageUpload = (event) => {
     const file = event.target.files[0]
     const reader = new FileReader()
@@ -41,7 +40,7 @@ function ProfileEdit() {
   }
 
   const handleImageRemove = () => {
-    setImage(null)
+    setImage(null);
   }
 
   const cookies = new Cookies()
@@ -84,6 +83,7 @@ function ProfileEdit() {
   useEffect(() => {
     newProfile()
   }, [])
+
 
 
   return (

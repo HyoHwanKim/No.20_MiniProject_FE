@@ -1,27 +1,148 @@
 import { faCircleLeft, faCircleRight } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import axios from 'axios'
+import React, { useState } from 'react'
+import { Cookies } from 'react-cookie'
+import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { useSelector } from 'react-redux'
-import React from 'react'
+import { useNavigate } from 'react-router'
+import { useLocation } from 'react-router-dom'
 import styled from 'styled-components'
+import { addReplys, editReplys } from '../api/posts'
 import Button from '../components/Button'
 import Image from '../components/Image'
 import Navbar from './Navbar'
-import { useLocation } from 'react-router-dom'
-import axios from 'axios'
+
+import { useRef } from 'react'
 
 const Detail = () => {
+  const [replyComment, setReplyComment] = useState('')
+  const [editReplyComment, setEditReplyComment] = useState(false)
+  const [getCommentId, setGetCommentId] = useState(0)
   const location = useLocation()
+  const navigate = useNavigate()
+  const replyInputRef = useRef(null)
+  const queryClient = useQueryClient()
   const getLoginInfo = useSelector((state) => state.loginUser)
+  const cookies = new Cookies()
 
   const { postComment, ...post } = location.state.post.post
-  console.log('post', post)
-  console.log('postComment', postComment)
+  const currentPostId = location.pathname.slice(8)
 
+  // * 해당 게시글의 댓글 리스트 비동기 조회
+  const { data } = useQuery('getCommentList', async () => {
+    const replyList = await axios.get(`http://3.34.52.229/api/posts/${currentPostId}/comments`)
+    return replyList.data
+  })
 
-
-  const deletePage = async (postId) => {
+  // * 게시글 삭제 click (테스트 필요)
+  const deletePage = async () => {
     if (window.confirm('게시글을 삭제하시겠습니까?')) {
-      await axios.patch(`http://3.34.52.229/api/posts/${postId}`)
+      await axios.patch(`http://3.34.52.229/api/posts/${currentPostId}`)
+        .then(() => {
+          queryClient.invalidateQueries('getCommentList')
+        })
+    }
+  }
+
+  // * reply onChange
+  const replyTxtAreaChange = (e) => {
+    setReplyComment(e.target.value)
+  }
+
+  // * 댓글 등록 useMutation
+  const addReplyMutation = useMutation(addReplys, {
+    onSuccess: (response) => {
+      setReplyComment('')
+      queryClient.invalidateQueries('getCommentList')
+    }
+  })
+
+  // * 댓글 등록 버튼 click
+  const addReplyClickHandelr = (e) => {
+    e.preventDefault()
+    if (!replyComment) {
+      alert('댓글을 입력해주세요.')
+      return
+    } else {
+      const replyInfo = {
+        postId: currentPostId,
+        comment: replyComment,
+        accesstoken: cookies.get('accesstoken'),
+        refreshtoken: cookies.get('refreshtoken'),
+      }
+      addReplyMutation.mutate(replyInfo)
+    }
+  }
+
+  // * 댓글 수정 글자 click
+  const setEditmodeHandler = (commentId, comment) => {
+    setEditReplyComment(true)
+    setGetCommentId(commentId)
+    setReplyComment(comment)
+    replyInputRef.current.focus()
+  }
+
+  // * 댓글 수정 useMutation
+  const editReplyMutation = useMutation(editReplys, {
+    onSuccess: (response) => {
+      setEditReplyComment(false)
+      setReplyComment('')
+      queryClient.invalidateQueries('getCommentList')
+    }
+  })
+
+  // * 댓글 수정 등록 버튼 click
+  const editReplySubmitHandler = (e) => {
+    e.preventDefault()
+    setEditReplyComment(true)
+    if (!replyComment) {
+      alert('댓글을 입력해주세요.')
+      return
+    } else {
+      const editReplyInfo = {
+        postId: currentPostId,
+        commentId: getCommentId,
+        comment: replyComment,
+        accesstoken: cookies.get('accesstoken'),
+        refreshtoken: cookies.get('refreshtoken'),
+      }
+      editReplyMutation.mutate(editReplyInfo)
+    }
+  }
+
+  // * 댓글 삭제 click
+  const deleteReplyHandler = async (commentId) => {
+    let deleteChk = window.confirm(`댓글을 삭제하시겠습니까?`);
+    if (!!deleteChk) {
+      await axios.delete(`http://3.34.52.229/api/posts/${currentPostId}/comments/${commentId}`, {
+        headers: {
+          accesstoken: cookies.get('accesstoken'),
+          refreshtoken: cookies.get('refreshtoken'),
+        }
+      })
+        .then(response => {
+          alert(`댓글이 삭제되었습니다.`)
+          queryClient.invalidateQueries('getCommentList')
+        })
+        .catch(error => {
+          console.error('axios deleteReply Error', error);
+        })
+    }
+  }
+
+  // * 이전 글 / 다음 글 이동 click
+  const movementClickHandler = async (movementPostId) => {
+    if (!movementPostId) {
+      alert('작성된 글이 없습니다.')
+    } else {
+      await axios.get(`http://3.34.52.229/api/posts/${movementPostId}`)
+        .then(response => {
+          navigate(`/detail/${movementPostId}`, { state: { post: response.data } })
+        })
+        .catch(error => {
+          console.error('axios pageMovementClick Error', error);
+        })
 
     }
   }
@@ -39,7 +160,7 @@ const Detail = () => {
               <ContentWriter>
                 <div>
                   <WriterSpan>{post.nickname}</WriterSpan>
-                  <span>·</span>
+                  <SpaceSpan>·</SpaceSpan>
                   <span>
                     {
                       `${post.createdAt.slice(0, 4)}년
@@ -87,62 +208,113 @@ const Detail = () => {
           </UserDiv>
           {/* 이전 포스트, 다음 포스트 */}
           <MovementDiv>
-            {
-              post.prevPostId !== '' &&
-              <MovementLeft>
-                <SetFontAwsomeLeft icon={faCircleLeft} />
-                <MovementSpanDiv>
-                  <AnotherPost>이전 포스트</AnotherPost>
+            <MovementLeft
+              onClick={() => movementClickHandler(post.prevPostId)}
+            >
+              <SetFontAwsomeLeft icon={faCircleLeft} />
+              <MovementSpanDiv>
+                <AnotherPost>이전 포스트</AnotherPost>
+                {post.prevPostId !== '' ?
                   <AnotherPostTitle>{post.prevPostTitle}</AnotherPostTitle>
-                </MovementSpanDiv>
-              </MovementLeft>
-            }
-            {
-              post.nextPostId !== '' &&
-              <MovementRight>
-                <MovementSpanDiv>
-                  <AnotherPost>다음 포스트</AnotherPost>
-                  <AnotherPostTitle>{post.nextPostTitle}</AnotherPostTitle>
-                </MovementSpanDiv>
-                <SetFontAwsomeRight icon={faCircleRight} />
-              </MovementRight>
-            }
+                  : <PostTitleNone>이전 글이 없습니다.</PostTitleNone>
+                }
+              </MovementSpanDiv>
+            </MovementLeft>
+            <MovementRight
+              onClick={() => movementClickHandler(post.nextPostId)}
+            >
+              <MovementSpanDiv>
+                <AnotherPost>다음 포스트</AnotherPost>
+                {
+                  post.nextPostId !== '' ?
+                    <AnotherPostTitle>{post.nextPostTitle}</AnotherPostTitle>
+                    : <PostTitleNone>다음 글이 없습니다.</PostTitleNone>
+                }
+              </MovementSpanDiv>
+              <SetFontAwsomeRight icon={faCircleRight} />
+            </MovementRight>
           </MovementDiv>
           {/* 댓글 */}
           <div>
             {/* 댓글 작성 */}
-            <ReplyTotalP>N개의 댓글</ReplyTotalP>
+            {/* <ReplyTotalP>{data.comments.length}개의 댓글</ReplyTotalP> */}
             <form>
-              <ReplyTextarea name="" placeholder="댓글을 작성하세요" cols="115" rows="5" />
+              <ReplyTextarea
+                name="comment"
+                value={replyComment}
+                onChange={replyTxtAreaChange}
+                ref={replyInputRef}
+                placeholder="댓글을 작성하세요"
+                cols="115"
+                rows="5"
+              />
               <FormButtonDiv>
-                <Button color={'mint'}>댓글 작성</Button>
+                {
+                  !editReplyComment &&
+                  <Button
+                    color={'mint'}
+                    onClick={addReplyClickHandelr}
+                  >
+                    댓글 작성
+                  </Button>
+                }
+                {
+                  !!editReplyComment &&
+                  <Button
+                    color={'mint'}
+                    onClick={editReplySubmitHandler}
+                  >
+                    댓글 수정
+                  </Button>
+                }
               </FormButtonDiv>
             </form>
             {/* 댓글 리스트 보기 */}
-            <ReplyList>
-              <div className="Reply">
-                <ReplyInfo>
-                  <Image
-                    src={`${process.env.PUBLIC_URL}/images/default_profile.png`}
-                    width={'65'}
-                    height={'65'}
-                  />
-                  <ReplyWriterInfo>
-                    <div>
-                      <ReplyNameP>usernickname</ReplyNameP>
-                      <ReplyDescP>2023년 4월 28일</ReplyDescP>
-                    </div>
-                    <EditReplyDiv>
-                      <EditReplySpan>수정</EditReplySpan>
-                      <EditReplySpan>삭제</EditReplySpan>
-                    </EditReplyDiv>
-                  </ReplyWriterInfo>
-                </ReplyInfo>
-                <ReplyContent>
-                  <p>도움이 되었어요!</p>
-                </ReplyContent>
-              </div>
-            </ReplyList>
+            {
+              data && data.comments &&
+              data.comments.map((reply) => (
+                <ReplyList key={reply.commentId}>
+                  <div className="Reply">
+                    <ReplyInfo>
+                      <Image
+                        src={`${process.env.PUBLIC_URL}/images/default_profile.png`}
+                        width={"65"}
+                        height={"65"}
+                      />
+                      <ReplyWriterInfo>
+                        <div>
+                          <ReplyNameP>{reply.nickname}</ReplyNameP>
+                          <ReplyDescP>
+                            {`${reply.createdAt.slice(0, 4)}년
+                              ${reply.createdAt.slice(5, 7)}월
+                              ${reply.createdAt.slice(8, 10)}일
+                              `}
+                          </ReplyDescP>
+                        </div>
+                        <EditReplyDiv>
+                          {getLoginInfo.nickname === reply.nickname && (
+                            <>
+                              <EditReplySpan
+                                onClick={() => setEditmodeHandler(reply.commentId, reply.comment)}
+                              >
+                                수정
+                              </EditReplySpan>
+                              <EditReplySpan
+                                onClick={() => deleteReplyHandler(reply.commentId)}
+                              >
+                                삭제
+                              </EditReplySpan>
+                            </>
+                          )}
+                        </EditReplyDiv>
+                      </ReplyWriterInfo>
+                    </ReplyInfo>
+                    <ReplyContent>
+                      <p>{reply.comment}</p>
+                    </ReplyContent>
+                  </div>
+                </ReplyList>
+              ))}
           </div>
         </MainContentDiv>
       </WrapMain>
@@ -193,6 +365,10 @@ const WriterSpan = styled.span`
   font-weight: bold;
   border-right: 10px;
 `
+
+const SpaceSpan = styled.span`
+  margin: 0 10px;
+ `
 
 const EditDiv = styled.div`
   display: flex;
@@ -297,7 +473,10 @@ const AnotherPost = styled.span`
 
 const AnotherPostTitle = styled.span`
   font-size: 16px;
-  font-weight: bold;
+`
+
+const PostTitleNone = styled.span`
+  color: #797979
 `
 
 // * Reply
@@ -307,7 +486,7 @@ const ReplyList = styled.div`
 `
 
 const ReplyTotalP = styled.p`
-  margin-left: 3px;
+  margin: 0px 0 50px 0px;
   font-size: 20px;
   font-weight: bold;
 `
@@ -318,7 +497,7 @@ const FormButtonDiv = styled.div`
 `
 
 const ReplyTextarea = styled.textarea`
-  margin: 20px 0;
+  margin-bottom: 10px;
   padding: 30px;
   resize: none;
   background-color: #1E1E1E;
