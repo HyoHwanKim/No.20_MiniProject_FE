@@ -30,8 +30,9 @@ const loginUsers = async (loginUser) => {
 
     await axios.post(`http://3.34.52.229/api/auth/login`, loginUser)
     .then(response => {
-      setResponse.getAccesstoken = response.data.accessToken
-      setResponse.getRefreshtoken = response.data.refreshToken
+      console.log(response);
+      setResponse.getAccesstoken = response.data.accesstoken
+      setResponse.getRefreshtoken = response.data.refreshtoken
     })
     .catch(error => {
       console.error(error.response)
@@ -52,6 +53,9 @@ const loginUsers = async (loginUser) => {
       .catch(error => {
         console.error(error.response)
       })
+    } else if (setResponse.getAccesstoken === '' || setResponse.getAccesstoken === null) {
+      alert('로그인 중 오류가 발생했습니다.')
+      return
     }
 
     return setResponse
