@@ -10,6 +10,8 @@ import Header from './Navbar'
 import axios from 'axios'
 import { useQuery } from 'react-query'
 import { useNavigate } from 'react-router'
+import { useEffect } from 'react'
+import { useState } from 'react'
 
 const Main = () => {
 

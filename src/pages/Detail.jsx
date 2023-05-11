@@ -14,6 +14,7 @@ import Image from '../components/Image'
 import Navbar from './Navbar'
 
 import { useRef } from 'react'
+import EditerView from '../components/EditerView'
 
 const Detail = () => {
   const [replyComment, setReplyComment] = useState('')
@@ -191,7 +192,7 @@ const Detail = () => {
             </ContentTop>
             {/* 본문 */}
             <ContentMiddle>
-              {post.content}
+              <EditerView markdown={post.content} />
             </ContentMiddle>
           </div>
           {/* 글 작성자 정보 */}

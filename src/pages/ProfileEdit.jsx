@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { MypageHeaderImg } from '../components/styles'
 import useInputState from '../hook/useInputState'
 import {
@@ -17,16 +17,18 @@ import { updateProfile } from '../redux/modules/login'
 
 function ProfileEdit() {
   const location = useLocation()
-  const myProfileInfo = location.state.loginInfo
+  const myProfileInfo = useSelector((state) => {
+    // console.log(state)
+    return state.loginUser
+  })
+  const dispatch = useDispatch()
+
   const [image, setImage] = useState(null)
 
-  // const [pageTitle, newTitle, handleTitleChange, handleTitleEdit] = useInputState("내 벨로그 제목")
   const [email, newEmail, handleEmailChange, handleEmailEdit] = useInputState(myProfileInfo.email)
   const [github, newGitHub, handleGitHubChange, handleGitHubEdit] = useInputState(myProfileInfo.github)
 
-  const dispatch = useDispatch()
 
-  console.log(email)
   const handleImageUpload = (event) => {
     const file = event.target.files[0]
     const reader = new FileReader()
@@ -50,8 +52,7 @@ function ProfileEdit() {
   const profileEdit = async (field, value) => {
     try {
       const { data } = await axios.put(
-        'http://15.164.232.59/api/auth/profile',
-        { [field]: value },
+        'http://15.164.232.59/api/auth/profile', { [field]: value },
         {
           headers: {
             accesstoken: `Bearer ${accesstoken}`,
@@ -59,7 +60,7 @@ function ProfileEdit() {
           }
         }
       )
-      dispatch(updateProfile(data))
+      console.log('put : ', data)
       newProfile()
     } catch (error) {
       console.error('에러 발생:', error)
@@ -74,7 +75,8 @@ function ProfileEdit() {
           refreshtoken: `Bearer ${refreshtoken}`,
         },
       })
-      dispatch(updateProfile(data))
+      console.log('get : ', data)
+      dispatch(updateProfile({ loginUser: data.userInfo }))
     } catch (error) {
       console.error('에러 발생:', error)
     }
@@ -83,8 +85,6 @@ function ProfileEdit() {
   useEffect(() => {
     newProfile()
   }, [])
-
-
 
   return (
     <>
