@@ -12,7 +12,7 @@ import { addReplys, editReplys } from '../api/posts'
 import Button from '../components/Button'
 import Image from '../components/Image'
 import Navbar from './Navbar'
-
+import ReactMarkdown from 'react-markdown';
 import { useRef } from 'react'
 import EditerView from '../components/EditerView'
 
@@ -36,13 +36,24 @@ const Detail = () => {
     return replyList.data
   })
 
-  // * 게시글 삭제 click (테스트 필요)
+  const accesstoken = cookies.get('accesstoken')
+  const refreshtoken = cookies.get('refreshtoken')
+
+
   const deletePage = async () => {
     if (window.confirm('게시글을 삭제하시겠습니까?')) {
-      await axios.patch(`http://3.34.52.229/api/posts/${currentPostId}`)
-        .then(() => {
-          queryClient.invalidateQueries('getCommentList')
-        })
+      await axios.patch(
+        `http://3.34.52.229/api/posts/${currentPostId}`, {},
+        {
+          headers: {
+            accesstoken: `Bearer ${accesstoken}`,
+            refreshtoken: `Bearer ${refreshtoken}`
+          }
+        }
+      ).then(() => {
+        navigate('/')
+      })
+
     }
   }
 
@@ -150,6 +161,11 @@ const Detail = () => {
     }
   }
 
+  const editDetailpage = (postId) => {
+    navigate('/edit', { state: { post: location.state.post, postId } })
+  }
+
+
   return (
     <>
       <Navbar />
@@ -179,7 +195,7 @@ const Detail = () => {
                   {
                     getLoginInfo.nickname === post.nickname &&
                     <>
-                      <EditSpan>수정</EditSpan>
+                      <EditSpan onClick={() => editDetailpage(currentPostId)}>수정</EditSpan>
                       <EditSpan onClick={deletePage}>삭제</EditSpan>
                     </>
                   }
@@ -192,7 +208,10 @@ const Detail = () => {
             </ContentTop>
             {/* 본문 */}
             <ContentMiddle>
-              <EditerView markdown={post.content} />
+              {/* <EditerView markdown={post.content} /> */}
+
+              <ReactMarkdown>{post.content}</ReactMarkdown>
+
             </ContentMiddle>
           </div>
           {/* 글 작성자 정보 */}
