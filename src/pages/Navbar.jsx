@@ -42,6 +42,10 @@ const Navbar = () => {
     navigate('/profile', { state: { loginInfo: getLoginInfo } });
   }
 
+  const myPageClick = () => {
+    navigate('/mypage', { state: { loginInfo: getLoginInfo } });
+  }
+
   return (
     <HeaderContainer>
       <HeaderContentLeft>
@@ -92,7 +96,7 @@ const Navbar = () => {
         {
           menuToggle &&
           <HeaderUl>
-            <HeaderLi onClick={() => navigate('/mypage')}>
+            <HeaderLi onClick={myPageClick}>
               내 비로그
             </HeaderLi>
             <HeaderLi onClick={profilePageClick}>

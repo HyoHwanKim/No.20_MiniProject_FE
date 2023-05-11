@@ -7,6 +7,7 @@ import Button from '../components/Button'
 import Image from '../components/Image'
 import Navbar from './Navbar'
 import { useLocation } from 'react-router-dom'
+import axios from 'axios'
 
 const Detail = () => {
   const location = useLocation()
@@ -18,7 +19,7 @@ const Detail = () => {
 
 
 
-  const deletePage = async () => {
+  const deletePage = async (postId) => {
     if (window.confirm('게시글을 삭제하시겠습니까?')) {
       await axios.patch(`http://3.34.52.229/api/posts/${postId}`)
 

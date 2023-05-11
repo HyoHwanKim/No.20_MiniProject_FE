@@ -3,7 +3,6 @@ import { Cookies } from 'react-cookie'
 
 const cookies = new Cookies()
 
-
 const initialState = {
   nickname: '',
   email: '',
@@ -31,11 +30,13 @@ const loginSlice = createSlice({
         // * 로그인 시 세팅된 상태값 초기화
         return initialState
       }
-    }
-  }
+    },
+    updateProfile: (state, action) => {
+      const { field, value } = action.payload
+      return { ...state, [field]: value }
+    },
+  },
 })
 
-// * 컴포넌트에서 사용하기 위해 action creator를 export
-export const { setLoginUser, setLogoutUser } = loginSlice.actions
-// * configStore에 등록하기 위해 reducer를 export default
+export const { setLoginUser, setLogoutUser, updateProfile } = loginSlice.actions
 export default loginSlice.reducer
